@@ -16,6 +16,7 @@ Route::get('/', function () {
 });
 
 Route::get('/documents', 'DocumentController@getAllDocumentsName');
+Route::get('/documents/{filename}', 'DocumentController@getDocument');
 Route::post('/documents', 'DocumentController@saveDocument');
 
 Route::get('/users/public/recent', 'UserController@getRecentPublicKey');

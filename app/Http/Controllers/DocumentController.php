@@ -12,6 +12,17 @@ class DocumentController extends Controller
     private $documentsDriver = 'documents';
     private $signedDocumentsDriver = 'signed-documents';
 
+    public function getDocument(Request $request, String $filename)
+    {
+
+        $isExist = Storage::disk($this->documentsDriver)->exists($filename);
+        if(!$isExist){
+           return abort(404);
+        }
+        $documentpath = Storage::disk($this->documentsDriver)->path($filename);
+        return response()->download($documentpath, $filename);
+    }
+    
     public function getAllDocumentsName(Request $request)
     {
         $files = Storage::disk($this->documentsDriver)->files();
