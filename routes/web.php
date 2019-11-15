@@ -15,9 +15,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/documents', 'DocumentController@getAllDocumentsName');
-Route::get('/documents/{filename}', 'DocumentController@getDocument');
-Route::post('/documents', 'DocumentController@saveDocument');
+Route::get('/document', 'DocumentController@getAllDocumentsName');
+Route::get('/document/{filename}', 'DocumentController@getDocument');
+Route::post('/document', 'DocumentController@saveDocument');
 
-Route::get('/users/public/recent', 'UserController@getRecentPublicKey');
-Route::post('/users/public', 'UserController@savePublicKey');
+Route::get('/user/public/recent', 'UserController@getRecentPublicKey');
+Route::post('/user/public', 'UserController@savePublicKey');

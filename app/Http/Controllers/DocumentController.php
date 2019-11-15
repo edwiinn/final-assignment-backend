@@ -14,7 +14,6 @@ class DocumentController extends Controller
 
     public function getDocument(Request $request, String $filename)
     {
-
         $isExist = Storage::disk($this->documentsDriver)->exists($filename);
         if(!$isExist){
            return abort(404);
@@ -22,12 +21,23 @@ class DocumentController extends Controller
         $documentpath = Storage::disk($this->documentsDriver)->path($filename);
         return response()->download($documentpath, $filename);
     }
+
+    public function getSignedDocument(Request $request, String $filename)
+    {
+        $isExist = Storage::disk($this->signedDocumentsDriver)->exists($filename);
+        if(!$isExist){
+           return abort(404);
+        }
+        $documentpath = Storage::disk($this->signedDocumentsDriver)->path($filename);
+        return response()->download($documentpath, $filename);
+    
+    }
     
     public function getAllDocumentsName(Request $request)
     {
         $files = Storage::disk($this->documentsDriver)->files();
         $response = json_encode([
-            'documentsName' => $files 
+            'documents_name' => $files 
         ]);
         return $response;
     }
@@ -41,8 +51,8 @@ class DocumentController extends Controller
         $documentName = $document->getClientOriginalName();
         $success = Storage::disk($this->signedDocumentsDriver)->put($documentName, file_get_contents($document));
         $response = json_encode([
-            'documentName' => $documentName,
-            'createdAt' => Carbon::now()->toDateTimeString()
+            'document_name' => $documentName,
+            'created_at' => Carbon::now()->toDateTimeString()
         ]);
         return $response;
     }
