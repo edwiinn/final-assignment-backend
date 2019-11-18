@@ -48,6 +48,28 @@ return [
             'root' => storage_path('app'),
         ],
 
+        'rootCA' => [
+            'driver' => 'local',
+            'root' => app_path('RootCA'),
+            'permissions' => [
+                'file' => [
+                    'public' => 0400,
+                    'private' => 0400,
+                ],
+            ],
+        ],
+
+        'certificates' => [
+            'driver' => 'local',
+            'root' => app_path('RootCA/certificates'),
+            'permissions' => [
+                'file' => [
+                    'public' => 0666,
+                    'private' => 0666,
+                ],
+            ],
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
