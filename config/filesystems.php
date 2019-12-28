@@ -53,8 +53,8 @@ return [
             'root' => app_path('RootCA'),
             'permissions' => [
                 'file' => [
-                    'public' => 0400,
-                    'private' => 0400,
+                    'public' => 0664,
+                    'private' => 0600,
                 ],
             ],
         ],
