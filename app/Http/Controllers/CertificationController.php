@@ -22,17 +22,6 @@ class CertificationController extends Controller
         $this->caPem = Storage::disk($this->rootCADriver)->get('myCA.pem');
     }
 
-    public function getRootCA()
-    {
-        $dirs = config('app.ca');
-        return var_dump($dirs);
-        $cer_response = json_encode([
-            certificate_key => $this->caKey,
-            certificate_pem => $this->caPem
-        ]);
-        return response($cer_response);
-    }
-
     public function signCsrRequest(Request $request){
         $request->validate([
             'csr' => 'required'

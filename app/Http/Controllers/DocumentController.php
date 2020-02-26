@@ -49,6 +49,21 @@ class DocumentController extends Controller
         ]);
         $document = $request->file('document');
         $documentName = $document->getClientOriginalName();
+        $success = Storage::disk($this->documentsDriver)->put($documentName, file_get_contents($document));
+        $response = json_encode([
+            'document_name' => $documentName,
+            'created_at' => Carbon::now()->toDateTimeString()
+        ]);
+        return $response;
+    }
+
+    public function saveSignedDocument(Request $request)
+    {
+        $request->validate([
+            'document' => 'required'
+        ]);
+        $document = $request->file('document');
+        $documentName = $document->getClientOriginalName();
         $success = Storage::disk($this->signedDocumentsDriver)->put($documentName, file_get_contents($document));
         $response = json_encode([
             'document_name' => $documentName,
