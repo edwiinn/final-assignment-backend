@@ -20,7 +20,8 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         //
-        'document',
+        'documents',
+        'signed-documents',
         'certificate/csr/sign',
     ];
 }

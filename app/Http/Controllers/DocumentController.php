@@ -24,22 +24,26 @@ class DocumentController extends Controller
 
     public function getSignedDocument(Request $request, String $filename)
     {
-        $isExist = Storage::disk($this->signedDocumentsDriver)->exists($filename);
-        if(!$isExist){
-           return abort(404);
+        $files = Storage::disk($this->signedDocumentsDriver)->files();
+        $filesResponse = [];
+        foreach ($files as $file) {
+            array_push($filesResponse, [
+                'name' => $file
+            ]);
         }
-        $documentpath = Storage::disk($this->signedDocumentsDriver)->path($filename);
-        return response()->download($documentpath, $filename);
-    
+        return response()->json($filesResponse, 200);;
     }
     
     public function getAllDocumentsName(Request $request)
     {
         $files = Storage::disk($this->documentsDriver)->files();
-        $response = json_encode([
-            'documents_name' => $files 
-        ]);
-        return $response;
+        $filesResponse = [];
+        foreach ($files as $file) {
+            array_push($filesResponse, [
+                'name' => $file
+            ]);
+        }
+        return response()->json($filesResponse, 200);
     }
 
     public function saveDocument(Request $request)
@@ -50,11 +54,11 @@ class DocumentController extends Controller
         $document = $request->file('document');
         $documentName = $document->getClientOriginalName();
         $success = Storage::disk($this->documentsDriver)->put($documentName, file_get_contents($document));
-        $response = json_encode([
+        $response = [
             'document_name' => $documentName,
             'created_at' => Carbon::now()->toDateTimeString()
-        ]);
-        return $response;
+        ];
+        return response()->json($response, 200);;
     }
 
     public function saveSignedDocument(Request $request)
