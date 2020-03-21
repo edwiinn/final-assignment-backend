@@ -37,13 +37,20 @@ class DocumentController extends Controller
     public function getAllDocumentsName(Request $request)
     {
         $files = Storage::disk($this->documentsDriver)->files();
-        $filesResponse = [];
+        $fileResponses = [];
+        $id = 1;
+        $count = count($files);
         foreach ($files as $file) {
-            array_push($filesResponse, [
-                'name' => $file
+            array_push($fileResponses, [
+                'id' => $id,
+                'title' => $file
             ]);
+            $id++;
         }
-        return response()->json($filesResponse, 200);
+        return response()->json([
+            "data" => $fileResponses,
+            "count" => $count
+        ], 200);
     }
 
     public function saveDocument(Request $request)
