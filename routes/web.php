@@ -26,3 +26,5 @@ Route::get('/user/public/recent', 'UserController@getRecentPublicKey');
 Route::post('/user/public', 'UserController@savePublicKey');
 
 Route::post('/certificate/csr/sign', 'CertificationController@signCsrRequest');
+
+Route::get('/auth/gl/callback', 'AuthController@googleCallback');
