@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Facades\Log;
 
 class CertificationController extends Controller
 {
@@ -41,11 +42,7 @@ class CertificationController extends Controller
         $csrCommonName = openssl_csr_get_subject($csr)["CN"];
         $_isCreated = Storage::disk($this->certificateDriver)->put($csrCommonName . '.crt', $certout);
         $crtFilePath = Storage::disk($this->certificateDriver)->path($csrCommonName . '.crt');
-        // $headers = [
-        //     'Content-Disposition' => 'attachment; filename="certificate.crt"'
-        // ];
-
-        // return response($certout, 200, $headers);
+        Log::info($csr);
         return response()->download($crtFilePath, $csrCommonName . '.crt' );
     }
 
