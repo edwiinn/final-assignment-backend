@@ -41,9 +41,11 @@ class DocumentController extends Controller
         $id = 1;
         $count = count($files);
         foreach ($files as $file) {
+            $filePath = Storage::disk($this->documentsDriver)->path($file);
             array_push($fileResponses, [
                 'id' => $id,
-                'title' => $file
+                'title' => $file,
+                'is_signed' => $this->isStringInFile($filePath, "adbe.pkcs7.detached") 
             ]);
             $id++;
         }
@@ -51,6 +53,21 @@ class DocumentController extends Controller
             "data" => $fileResponses,
             "count" => $count
         ], 200);
+    }
+
+    public function isStringInFile($file,$string){
+
+        $handle = fopen($file, 'r');
+        $valid = false; // init as false
+        while (($buffer = fgets($handle)) !== false) {
+            if (strpos($buffer, $string) !== false) {
+                $valid = TRUE;
+                break; // Once you find the string, you should break out the loop.
+            }      
+        }
+        fclose($handle);
+
+        return $valid;
     }
 
     public function saveDocument(Request $request)
