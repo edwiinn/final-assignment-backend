@@ -19,10 +19,28 @@ class DocumentController extends Controller
            return abort(404);
         }
         $documentpath = Storage::disk($this->documentsDriver)->path($filename);
-        return response()->download($documentpath, $filename);
+        $headers = [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="'.$filename.'"'
+        ];
+        return response()->file($documentpath, $headers);
     }
 
     public function getSignedDocument(Request $request, String $filename)
+    {
+        $isExist = Storage::disk($this->signedDocumentsDriver)->exists($filename);
+        if(!$isExist){
+           return abort(404);
+        }
+        $documentpath = Storage::disk($this->signedDocumentsDriver)->path($filename);
+        $headers = [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="'.$filename.'"'
+        ];
+        return response()->file($documentpath, $headers);
+    }
+
+    public function getSignedDocuments(Request $request)
     {
         $files = Storage::disk($this->signedDocumentsDriver)->files();
         $filesResponse = [];

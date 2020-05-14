@@ -20,6 +20,7 @@ Route::get('/documents/{filename}', 'DocumentController@getDocument');
 Route::post('/documents', 'DocumentController@saveDocument');
 
 Route::get('/signed-documents/{filename}', 'DocumentController@getSignedDocument');
+Route::get('/signed-documents', 'DocumentController@getSignedDocuments');
 Route::post('/signed-documents', 'DocumentController@saveSignedDocument');
 
 Route::get('/user/public/recent', 'UserController@getRecentPublicKey');
