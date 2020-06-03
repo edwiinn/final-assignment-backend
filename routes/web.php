@@ -16,16 +16,14 @@ Route::get('/', function () {
 });
 
 Route::get('/documents', 'DocumentController@getAllDocumentsName');
-Route::get('/documents/{filename}', 'DocumentController@getDocument');
+Route::get('/documents/{document_id}', 'DocumentController@getDocument');
 Route::post('/documents', 'DocumentController@saveDocument');
 
-Route::get('/signed-documents/{filename}', 'DocumentController@getSignedDocument');
-Route::get('/signed-documents', 'DocumentController@getSignedDocuments');
-Route::post('/signed-documents', 'DocumentController@saveSignedDocument');
+// Route::get('/signed-documents/{filename}', 'DocumentController@getSignedDocument');
+// Route::get('/signed-documents', 'DocumentController@getSignedDocuments');
+// Route::post('/signed-documents', 'DocumentController@saveSignedDocument');
 
 Route::get('/user/public/recent', 'UserController@getRecentPublicKey');
 Route::post('/user/public', 'UserController@savePublicKey');
-
+Route::get('/user/keypair', 'UserController@getKeyPair');
 Route::post('/certificate/csr/sign', 'CertificationController@signCsrRequest');
-
-Route::get('/auth/gl/callback', 'AuthController@googleCallback');

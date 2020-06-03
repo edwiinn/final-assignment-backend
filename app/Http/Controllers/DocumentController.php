@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Document;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Ramsey\Uuid\Uuid;
 
 class DocumentController extends Controller
 {
@@ -12,13 +14,16 @@ class DocumentController extends Controller
     private $documentsDriver = 'documents';
     private $signedDocumentsDriver = 'signed-documents';
 
-    public function getDocument(Request $request, String $filename)
+    public function getDocument(Request $request, String $documentId)
     {
-        $isExist = Storage::disk($this->documentsDriver)->exists($filename);
+        $document = Document::find($documentId);
+        $filepath = $document->filepath;
+        $filename = $document->name;
+        $isExist = Storage::disk($this->documentsDriver)->exists($filepath);
         if(!$isExist){
            return abort(404);
         }
-        $documentpath = Storage::disk($this->documentsDriver)->path($filename);
+        $documentpath = Storage::disk($this->documentsDriver)->path($filepath);
         $headers = [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="'.$filename.'"'
@@ -40,7 +45,7 @@ class DocumentController extends Controller
         return response()->file($documentpath, $headers);
     }
 
-    public function getSignedDocuments(Request $request)
+    public function getSignedDocuments()
     {
         $files = Storage::disk($this->signedDocumentsDriver)->files();
         $filesResponse = [];
@@ -52,24 +57,19 @@ class DocumentController extends Controller
         return response()->json($filesResponse, 200);;
     }
     
-    public function getAllDocumentsName(Request $request)
+    public function getAllDocumentsName()
     {
-        $files = Storage::disk($this->documentsDriver)->files();
-        $fileResponses = [];
-        $id = 1;
-        $count = count($files);
-        foreach ($files as $file) {
-            $filePath = Storage::disk($this->documentsDriver)->path($file);
-            array_push($fileResponses, [
-                'id' => $id,
-                'title' => $file,
-                'is_signed' => $this->isStringInFile($filePath, "adbe.pkcs7.detached") 
+        $documents = Document::get();
+        $documentRespone = [];
+        foreach ($documents as $document) {
+            array_push($documentRespone, [
+                'id' => $document->id,
+                'title' => $document->name,
+                'is_signed' => $document->signed
             ]);
-            $id++;
         }
         return response()->json([
-            "data" => $fileResponses,
-            "count" => $count
+            "data" => $documentRespone,
         ], 200);
     }
 
@@ -90,17 +90,22 @@ class DocumentController extends Controller
 
     public function saveDocument(Request $request)
     {
-        $request->validate([
-            'document' => 'required'
-        ]);
-        $document = $request->file('document');
-        $documentName = $document->getClientOriginalName();
-        $success = Storage::disk($this->documentsDriver)->put($documentName, file_get_contents($document));
-        $response = [
-            'document_name' => $documentName,
-            'created_at' => Carbon::now()->toDateTimeString()
-        ];
-        return response()->json($response, 200);;
+        try {
+            $request->validate([
+                'document' => 'required'
+            ]);
+            $document = $request->file('document');
+            $documentName = $document->getClientOriginalName();
+            $pathName = Uuid::uuid1()->toString() . "." . $document->getClientOriginalExtension(); 
+            $success = Storage::disk($this->documentsDriver)->put($pathName, file_get_contents($document));
+            $documentCreated = Document::create([
+                'name' => $documentName,
+                'filepath' => $pathName
+            ]);
+            return response()->json($documentCreated, 200);;
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th->getMessage()], 500);
+        }
     }
 
     public function saveSignedDocument(Request $request)
@@ -110,12 +115,14 @@ class DocumentController extends Controller
         ]);
         $document = $request->file('document');
         $documentName = $document->getClientOriginalName();
-        $success = Storage::disk($this->signedDocumentsDriver)->put($documentName, file_get_contents($document));
-        $response = json_encode([
-            'document_name' => $documentName,
-            'created_at' => Carbon::now()->toDateTimeString()
+        $pathName = Uuid::uuid1()->toString() . "." . $document->getClientOriginalExtension(); 
+        $success = Storage::disk($this->documentsDriver)->put($pathName, file_get_contents($document));
+        $documentCreated = Document::create([
+            'name' => $documentName,
+            'filepath' => $pathName,
+            'signed' => true
         ]);
-        return $response;
+        return response()->json($documentCreated, 200);;
     }
 
     public function verifyDocument(Request $request)
